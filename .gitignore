@@ -1,7 +1,12 @@
 # Docker & OS файлы
-db_data/
-bx_temp/
-logs/
+/db_data/*
+!/db_data/.gitkeep
+
+/bx_temp/*
+!/bx_temp/.gitkeep
+
+/logs/*
+!/logs/.gitkeep
 .DS_Store
 .idea/
 .vscode/
