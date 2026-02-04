@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # База данных Percona (оптимизирована под Битрикс)
+  mysql:
+    image: quay.io/bitrix24/percona-server:8.0.44-v1-rhel
+    container_name: bitrix_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: bitrix
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: bitrix
+      MYSQL_PASSWORD: bitrix_password
+    volumes:
+      - ./db_data:/var/lib/mysql
+    networks:
+      - bitrix_net
+
+  # Основной PHP 8.4
+  php:
+    image: quay.io/bitrix24/php:8.4.17-fpm-v1-alpine
+    container_name: bitrix_php
+    restart: unless-stopped
+    volumes:
+      - ./confs/php84/etc/:/usr/local/etc/
+      - ./www:/opt/www/:cached
+      - ./bx_temp:/opt/.bx_temp/
+    depends_on:
+      - mysql
+    networks:
+      - bitrix_net
+
+  # Nginx на 80 порту
+  nginx:
+    image: quay.io/bitrix24/nginx:1.28.1-v1-alpine
+    container_name: bitrix_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./confs/nginx/:/etc/nginx/
+      - ./www:/opt/www/:cached
+      - ./bx_temp:/opt/.bx_temp/
+    depends_on:
+      - php
+    networks:
+      - bitrix_net
+
+  # Memcached
+  memcached:
+    image: memcached:1.6.40-alpine
+    container_name: bitrix_memcached
+    restart: unless-stopped
+    networks:
+      - bitrix_net
+
+  # Cron (также на PHP 8.4)
+  cron:
+    image: quay.io/bitrix24/php:8.4.17-fpm-v1-alpine
+    container_name: bitrix_cron
+    restart: unless-stopped
+    command: crond -f -d 8
+    user: root
+    volumes:
+      - ./confs/php84/etc/:/usr/local/etc/
+      - ./www:/opt/www/:cached
+    depends_on:
+      - php
+    networks:
+      - bitrix_net
+
+networks:
+  bitrix_net:
+    driver: bridge

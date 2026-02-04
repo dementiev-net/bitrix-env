@@ -1,0 +1,34 @@
+# Docker & OS файлы
+db_data/
+bx_temp/
+logs/
+.DS_Store
+.idea/
+.vscode/
+
+# Битрикс: Ядро и системные папки (их не коммитим, они обновляются из админки)
+/www/bitrix/*
+!/www/bitrix/php_interface/
+!/www/bitrix/templates/
+# Если используешь старый подход, templates и php_interface лучше перенести в /local/
+
+# Битрикс: Кеш и логи
+/www/bitrix/cache/
+/www/bitrix/managed_cache/
+/www/bitrix/stack_cache/
+/www/bitrix/html_pages/
+/www/bitrix/backup/
+/www/bitrix/updates/
+/www/upload/
+/www/upload/tmp/
+/www/upload/resize_cache/
+
+# Конфиги с паролями (важно!)
+/www/bitrix/.settings.php
+/www/bitrix/php_interface/dbconn.php
+/www/local/php_interface/dbconn.php
+
+# Служебные файлы
+/www/bitrix_setup.php
+/www/restore.php
+*.log
