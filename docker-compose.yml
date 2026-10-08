@@ -58,24 +58,17 @@ services:
   # Cron (также на PHP 8.4)
   cron:
     image: quay.io/bitrix24/php:8.4.17-fpm-v1-alpine
-    container_name: bcore_cron
+    container_name: bitrix_cron
     restart: unless-stopped
-    # busybox crond игнорирует crontab не от root, поэтому доп. строки дописываем при старте (идемпотентно)
-    command: sh -c 'grep -vxFf /etc/crontabs/root /etc/cron.extra >> /etc/crontabs/root; exec crond -f -d 8'
+    command: crond -f -d 8
     user: root
-    dns:
-      - 192.168.2.1
     volumes:
       - ./confs/php84/etc/:/usr/local/etc/
-      - ./confs/msmtp/msmtprc:/opt/msmtp/.msmtprc:ro
-      - ./confs/cron/crontab-extra:/etc/cron.extra:ro
-      - ./confs/cron/periodic:/etc/periodic-extra:ro
       - ./www:/opt/www/:cached
     depends_on:
       - php
     networks:
-      - bcore_net
-      - infra_net
+      - bitrix_net
 
 networks:
   bitrix_net:
